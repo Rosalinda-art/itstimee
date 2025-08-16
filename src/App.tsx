@@ -260,6 +260,50 @@ function App() {
         }
     }, [darkMode]);
 
+    // Check for past sessions and automatically mark them as skipped
+    useEffect(() => {
+        // Only run this check after data has been loaded from storage
+        if (!hasLoadedFromStorage) return;
+
+        // Check if there are any study plans to process
+        if (studyPlans.length === 0) return;
+
+        // Mark past incomplete sessions as skipped
+        const updatedPlans = markPastSessionsAsSkipped(studyPlans);
+
+        // Check if any sessions were actually updated
+        const hasChanges = JSON.stringify(updatedPlans) !== JSON.stringify(studyPlans);
+
+        if (hasChanges) {
+            setStudyPlans(updatedPlans);
+
+            // Count how many sessions were automatically skipped
+            let skippedCount = 0;
+            updatedPlans.forEach(plan => {
+                plan.plannedTasks.forEach(session => {
+                    if (session.status === 'skipped' &&
+                        session.skipMetadata?.reason === 'overload' &&
+                        session.skipMetadata?.skippedAt) {
+                        const skippedDate = new Date(session.skipMetadata.skippedAt);
+                        const now = new Date();
+                        // Only count if skipped recently (within last 5 minutes to avoid counting old ones)
+                        if (now.getTime() - skippedDate.getTime() < 5 * 60 * 1000) {
+                            skippedCount++;
+                        }
+                    }
+                });
+            });
+
+            // Show notification if sessions were automatically skipped
+            if (skippedCount > 0) {
+                setNotificationMessage(
+                    `📅 ${skippedCount} past incomplete session${skippedCount > 1 ? 's' : ''} ${skippedCount > 1 ? 'were' : 'was'} automatically marked as skipped. They will not be rescheduled.`
+                );
+                setTimeout(() => setNotificationMessage(null), 6000);
+            }
+        }
+    }, [hasLoadedFromStorage, studyPlans]);
+
     // Update gamification when study data changes
     const updateGamificationData = (updatedStudyPlans?: StudyPlan[], updatedTasks?: Task[]) => {
         const plansToUse = updatedStudyPlans || studyPlans;
