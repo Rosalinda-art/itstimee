@@ -1,4 +1,4 @@
-import { Task, StudyPlan, StudySession, UserSettings, FixedCommitment, UserReschedule, DateSpecificStudyWindow } from '../types';
+import { Task, StudyPlan, StudySession, UserSettings, FixedCommitment, UserReschedule, DateSpecificStudyWindow, SkipMetadata } from '../types';
 
 // Utility functions
 export const getLocalDateString = (): string => {
