@@ -69,6 +69,7 @@ function App() {
     const [, setLastPlanStaleReason] = useState<"settings" | "commitment" | "task" | null>(null);
     const [hasLoadedFromStorage, setHasLoadedFromStorage] = useState(false);
     const [hasFirstChangeOccurred, setHasFirstChangeOccurred] = useState(false);
+    const hasProcessedPastSessions = useRef(false);
 
     // Add state to track last-timed session and ready-to-mark-done
     const [lastTimedSession, setLastTimedSession] = useState<{ planDate: string; sessionNumber: number } | null>(null);
