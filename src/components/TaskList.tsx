@@ -290,6 +290,20 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
     const hours = Math.floor(totalMinutes / 60);
     const minutes = totalMinutes % 60;
 
+    // Check if task was created with session-based estimation
+    const wasSessionBased = task.preferredSessionDuration && task.preferredSessionDuration > 0;
+    let sessionHours = '';
+    let sessionMinutes = '30';
+    let estimationMode: 'total' | 'session' = 'total';
+
+    if (wasSessionBased) {
+      // Restore session-based estimation with original session duration
+      estimationMode = 'session';
+      const sessionTotalMinutes = Math.round(task.preferredSessionDuration * 60);
+      sessionHours = Math.floor(sessionTotalMinutes / 60).toString();
+      sessionMinutes = (sessionTotalMinutes % 60).toString();
+    }
+
     setEditFormData({
       title: task.title,
       description: task.description,
@@ -310,9 +324,9 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
       maxSessionLength: task.maxSessionLength || 2,
       isOneTimeTask: task.isOneTimeTask || false,
       startDate: task.startDate || today,
-      estimationMode: 'total',
-      sessionDurationHours: '',
-      sessionDurationMinutes: '30',
+      estimationMode: estimationMode,
+      sessionDurationHours: sessionHours,
+      sessionDurationMinutes: sessionMinutes,
     });
     setShowAdvancedOptions(false);
   };
