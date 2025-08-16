@@ -174,7 +174,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
 
     if (!editFormData.impact) errors.push('Please select task importance');
     if (editFormData.deadline && editFormData.deadline < today) errors.push('Deadline cannot be in the past');
-    if (editFormData.startDate && editFormData.startDate < today && !editFormData.isOneTimeTask) errors.push('Start date cannot be in the past');
+    // Start date validation removed for editing tasks - tasks are already created
 
     if (editFormData.category === 'Custom...' && (!editFormData.customCategory?.trim() || editFormData.customCategory.trim().length > 50)) {
       errors.push('Custom category must be between 1-50 characters');
@@ -190,8 +190,7 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
   
   // Check if deadline is in the past
   const isDeadlinePast = editFormData.deadline ? editFormData.deadline < today : false;
-  // Check if start date is in the past
-  const isStartDateNotPast = editFormData.startDate ? editFormData.startDate >= today : true;
+  // Start date validation removed for editing tasks
 
   // Check for deadline conflict with frequency preference
   const deadlineConflict = useMemo(() => {
@@ -528,11 +527,9 @@ const TaskList: React.FC<TaskListProps> = ({ tasks, onUpdateTask, onDeleteTask, 
                               min={today}
                               value={editFormData.startDate || ''}
                               onChange={(e) => setEditFormData({ ...editFormData, startDate: e.target.value || today })}
-                              className={`w-full px-3 py-2 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 bg-white dark:bg-gray-800 dark:text-white ${!isStartDateNotPast && editFormData.startDate ? 'border-red-500 focus:ring-red-500' : ''}`}
+                              className="w-full px-3 py-2 border rounded-lg text-base focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 bg-white dark:bg-gray-800 dark:text-white"
                             />
-                            {!isStartDateNotPast && editFormData.startDate && (
-                              <div className="text-red-600 text-xs mt-1">Start date cannot be in the past.</div>
-                            )}
+                            {/* Start date validation warning removed for editing tasks */}
                           </div>
                         )}
                       </div>
