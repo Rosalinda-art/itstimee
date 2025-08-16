@@ -305,6 +305,30 @@ function App() {
         hasProcessedPastSessions.current = true;
     }, [hasLoadedFromStorage, studyPlans]);
 
+    // Daily check for past sessions - runs when app loads and date has changed
+    useEffect(() => {
+        if (!hasLoadedFromStorage) return;
+
+        const lastCheckDate = localStorage.getItem('timepilot-last-past-session-check');
+        const today = getLocalDateString();
+
+        // If we haven't checked today, or this is the first time
+        if (lastCheckDate !== today && studyPlans.length > 0) {
+            // Mark past incomplete sessions as skipped
+            const updatedPlans = markPastSessionsAsSkipped(studyPlans);
+
+            // Check if any sessions were actually updated
+            const hasChanges = JSON.stringify(updatedPlans) !== JSON.stringify(studyPlans);
+
+            if (hasChanges) {
+                setStudyPlans(updatedPlans);
+            }
+
+            // Update the last check date
+            localStorage.setItem('timepilot-last-past-session-check', today);
+        }
+    }, [hasLoadedFromStorage]); // Run when app loads
+
     // Update gamification when study data changes
     const updateGamificationData = (updatedStudyPlans?: StudyPlan[], updatedTasks?: Task[]) => {
         const plansToUse = updatedStudyPlans || studyPlans;
