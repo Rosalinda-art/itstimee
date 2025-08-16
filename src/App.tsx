@@ -264,7 +264,7 @@ function App() {
     // Check for past sessions and automatically mark them as skipped (run once after initial load)
     useEffect(() => {
         // Only run this check after data has been loaded from storage and we have plans
-        if (!hasLoadedFromStorage || studyPlans.length === 0) return;
+        if (!hasLoadedFromStorage || studyPlans.length === 0 || hasProcessedPastSessions.current) return;
 
         // Mark past incomplete sessions as skipped
         const updatedPlans = markPastSessionsAsSkipped(studyPlans);
@@ -300,7 +300,10 @@ function App() {
                 setTimeout(() => setNotificationMessage(null), 6000);
             }
         }
-    }, [hasLoadedFromStorage]); // Only depend on hasLoadedFromStorage, not studyPlans
+
+        // Mark that we've processed past sessions to avoid running again
+        hasProcessedPastSessions.current = true;
+    }, [hasLoadedFromStorage, studyPlans]);
 
     // Update gamification when study data changes
     const updateGamificationData = (updatedStudyPlans?: StudyPlan[], updatedTasks?: Task[]) => {
